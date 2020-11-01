@@ -34,26 +34,43 @@ print("Listening ok.")
 clientsock,addr = serversock.accept()   #accepting client
 print("Client accepted, connection ok.")
 
-while True: #loops until client sends "bye"
+print("Authenticating client...")
 
-    data = clientsock.recv(1024)    #receiving data from client socket
+msg1 = "Server: Please enter the password (1111): " #password is 1111
+clientsock.send(msg1.encode())   
 
-    data = data.decode()    #decoding data
+data = clientsock.recv(1024) #receiving password data from client socket
+data = data.decode()
+if data == "1111": #checking if password is correct
+    print("Authentication ok.")
+    msg2 = "Server: Password ok."
+    clientsock.send(msg2.encode())   
+    while True: #loops until client sends "bye"
 
-    print("Client sent: '",data,"'")
+        data = clientsock.recv(1024)    #receiving data from client socket
 
-    if data=="bye":         #checking for termination message
-        bye = "Goodbye!"
-        clientsock.send(bye.encode())   #sending Goodbye! to client
+        data = data.decode()    #decoding data
+
+        print("Client sent: '",data,"'")
+
+        if data=="bye":         #checking for termination message
+            bye = "Goodbye!"
+            clientsock.send(bye.encode())   #sending Goodbye! to client
         
-    if data=="bye": #new if statement is necessary as Goodbye! message wouldn't have been sent in time otherwise
-        clientsock.close()  #closing the socket
-        print("Closed connection to client.")
-        break
+        if data=="bye": #new if statement is necessary as Goodbye! message wouldn't have been sent in time otherwise
+            clientsock.close()  #closing the socket
+            print("Closed connection to client.")
+            break
 
 
-    else : #if no termination message "bye"
+        else : #if no termination message "bye"
 
-        ACK = "Your message was recieved, waiting for new message. Send 'bye' to close connection."
+            ACK = "Server: Your message was recieved, waiting for new message. Send 'bye' to close connection."
 
-        clientsock.send(ACK.encode()) #sending acknowledgement to client
+            clientsock.send(ACK.encode()) #sending acknowledgement to client
+            
+else: #if client enters wrong password
+    msg3 = "Server: Password is incorrect, terminating connection."
+    clientsock.send(msg3.encode())
+    clientsock.close() #closing the socket
+    print("Authentication failed, terminating connection.")

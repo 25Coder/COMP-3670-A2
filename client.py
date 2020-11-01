@@ -16,19 +16,33 @@ ip=socket.gethostbyname(name) #storing IP address
 
 clientsock.connect((ip,5555)) #attempting to connect
 
-while True:
+server_msg = clientsock.recv(1024).decode() #receiving data from server socket
 
-    print("Enter a message to send to the server:")
+print(server_msg)
+data=input()
 
-    data=input() #message that will be sent to server will be in data
+clientsock.send(data.encode())
+server_msg2 = clientsock.recv(1024).decode()
 
-    clientsock.send(data.encode())    #sending the server our message
+if server_msg2 == "Server: Password is incorrect, terminating connection.":
+    print(server_msg2)
+    exit
+
+else:
+    while True:
+
+        print("Enter a message to send to the server:")
+
+        data=input() #message that will be sent to server will be in data
+
+        clientsock.send(data.encode())    #sending the server our message
 
     
-    ACK = clientsock.recv(1024).decode() #receiving any acknowledgement from server
+        ACK = clientsock.recv(1024).decode() #receiving any acknowledgement from server
 
-    print(ACK) #printing acknowledgement from server
+        print(ACK) #printing acknowledgement from server
 
-    if data=="bye": #"bye" is the message the client can use to terminate the connection
-        print("Connection closed.")
-        break
+        if data=="bye": #"bye" is the message the client can use to terminate the connection
+            print("Connection closed.")
+            break
+    
